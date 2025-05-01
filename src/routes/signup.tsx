@@ -37,7 +37,7 @@ function Signup() {
 	});
 
 	return (
-		<div className="min-h-lvh grid place-content-center">
+		<div className="h-dvh grid place-content-center">
 			<div className="bg-white rounded-2xl p-6 md:w-[31.25rem] shadow-lg">
 				<h1 className="highlighted-text">Welcome to CodeLeap network!</h1>
 				<form
