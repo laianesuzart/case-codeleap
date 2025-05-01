@@ -1,9 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+
+import { useStore } from "../lib/store";
 
 export const Route = createFileRoute("/")({
-	component: App,
+	beforeLoad: ({ context }) => {
+		if (!context.username) {
+			throw redirect({
+				to: "/signup",
+			});
+		}
+	},
+	component: Home,
 });
 
-function App() {
-	return <div className="text-center" />;
+function Home() {
+	const username = useStore((state) => state.username);
+
+	return (
+		<div className="text-center">
+			<h1>{username}</h1>
+		</div>
+	);
 }

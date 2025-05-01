@@ -8,6 +8,7 @@ import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
 import { routeTree } from "./routeTree.gen";
 
 import "./styles.css";
+import { useStore } from "./lib/store.ts";
 import reportWebVitals from "./reportWebVitals.ts";
 
 // Create a new router instance
@@ -15,6 +16,7 @@ const router = createRouter({
 	routeTree,
 	context: {
 		...TanstackQuery.getContext(),
+		username: "",
 	},
 	defaultPreload: "intent",
 	scrollRestoration: true,
@@ -29,14 +31,20 @@ declare module "@tanstack/react-router" {
 	}
 }
 
+function InnerApp() {
+	const username = useStore((state) => state.username);
+	return <RouterProvider router={router} context={{ username }} />;
+}
+
 // Render the app
 const rootElement = document.getElementById("app");
 if (rootElement && !rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement);
+
 	root.render(
 		<StrictMode>
 			<TanstackQuery.Provider>
-				<RouterProvider router={router} />
+				<InnerApp />
 			</TanstackQuery.Provider>
 		</StrictMode>,
 	);
