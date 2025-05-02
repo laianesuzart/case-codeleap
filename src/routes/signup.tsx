@@ -32,13 +32,13 @@ function Signup() {
 		onSubmit: ({ value }) => {
 			document.cookie = `username=${value.username}`;
 			updateStore({ field: "username", value: value.username });
-			navigate({ to: "/" });
+			navigate({ to: "/", viewTransition: { types: ["slide-right"] } });
 		},
 	});
 
 	return (
-		<div className="h-dvh grid place-content-center">
-			<div className="bg-white rounded-2xl p-6 md:w-[31.25rem] shadow-lg">
+		<div className="h-dvh grid place-content-center [view-transition-name:main-content]">
+			<main className="bg-white rounded-2xl p-6 md:w-[31.25rem] shadow-lg">
 				<h1 className="highlighted-text">Welcome to CodeLeap network!</h1>
 				<form
 					onSubmit={(e) => {
@@ -60,7 +60,7 @@ function Signup() {
 						<form.SubscribeButton label="Enter" />
 					</form.AppForm>
 				</form>
-			</div>
+			</main>
 		</div>
 	);
 }

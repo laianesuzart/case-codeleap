@@ -8,6 +8,7 @@ import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
 import { routeTree } from "./routeTree.gen";
 
 import "./styles.css";
+import { NotFound } from "./components/NotFound.tsx";
 import { useStore } from "./lib/store.ts";
 import reportWebVitals from "./reportWebVitals.ts";
 
@@ -22,6 +23,7 @@ const router = createRouter({
 	scrollRestoration: true,
 	defaultStructuralSharing: true,
 	defaultPreloadStaleTime: 0,
+	defaultNotFoundComponent: NotFound,
 });
 
 // Register the router instance for type safety
