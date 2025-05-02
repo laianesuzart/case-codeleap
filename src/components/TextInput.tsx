@@ -34,7 +34,7 @@ export function TextInput({
 					id={inputId}
 					className={clsx(
 						inputStyles,
-						"resize-none field-sizing-content min-h-[74px]",
+						"resize-none field-sizing-content min-h-[74px] wrap-anywhere max-h-[30svh]",
 					)}
 					{...(rest as TextareaProps)}
 				/>
