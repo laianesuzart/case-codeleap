@@ -19,7 +19,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				target="_blank"
 				rel="noreferrer"
 				title="Github"
-				className="z-10 absolute bottom-4 right-4 p-1 text-[#d1d7e0] bg-[#151b23] rounded-full shadow-md hover:invert transition-discrete duration-300"
+				className="z-10 fixed bottom-4 right-4 p-1 text-[#d1d7e0] bg-[#151b23] rounded-full shadow-md hover:invert transition-discrete duration-300"
 			>
 				<GithubLogo />
 			</a>
