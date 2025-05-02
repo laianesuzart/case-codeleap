@@ -1,10 +1,18 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { updateStore } from "@/lib/store";
 import { useAppForm } from "../hooks/form";
 
 export const Route = createFileRoute("/signup")({
+	beforeLoad: ({ context }) => {
+		if (context.username) {
+			throw redirect({
+				to: "/",
+				viewTransition: { types: ["slide-left"] },
+			});
+		}
+	},
 	component: Signup,
 });
 
