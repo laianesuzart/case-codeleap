@@ -13,7 +13,6 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as SignupImport } from './routes/signup'
 import { Route as IndexImport } from './routes/index'
-import { Route as DemoClerkImport } from './routes/demo.clerk'
 
 // Create/Update Routes
 
@@ -26,12 +25,6 @@ const SignupRoute = SignupImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DemoClerkRoute = DemoClerkImport.update({
-  id: '/demo/clerk',
-  path: '/demo/clerk',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -53,13 +46,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupImport
       parentRoute: typeof rootRoute
     }
-    '/demo/clerk': {
-      id: '/demo/clerk'
-      path: '/demo/clerk'
-      fullPath: '/demo/clerk'
-      preLoaderRoute: typeof DemoClerkImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -68,41 +54,36 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/signup': typeof SignupRoute
-  '/demo/clerk': typeof DemoClerkRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/signup': typeof SignupRoute
-  '/demo/clerk': typeof DemoClerkRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/signup': typeof SignupRoute
-  '/demo/clerk': typeof DemoClerkRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/signup' | '/demo/clerk'
+  fullPaths: '/' | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/signup' | '/demo/clerk'
-  id: '__root__' | '/' | '/signup' | '/demo/clerk'
+  to: '/' | '/signup'
+  id: '__root__' | '/' | '/signup'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SignupRoute: typeof SignupRoute
-  DemoClerkRoute: typeof DemoClerkRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SignupRoute: SignupRoute,
-  DemoClerkRoute: DemoClerkRoute,
 }
 
 export const routeTree = rootRoute
@@ -116,8 +97,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/signup",
-        "/demo/clerk"
+        "/signup"
       ]
     },
     "/": {
@@ -125,9 +105,6 @@ export const routeTree = rootRoute
     },
     "/signup": {
       "filePath": "signup.tsx"
-    },
-    "/demo/clerk": {
-      "filePath": "demo.clerk.tsx"
     }
   }
 }
