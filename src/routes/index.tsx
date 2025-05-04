@@ -1,27 +1,28 @@
+import { Fallback } from "@/components/Fallback";
+import { Loader } from "@/components/Loader";
 import FeedPost from "@/components/modules/FeedPost";
 import { ConfirmDeleteActionModal } from "@/components/widgets/ConfirmDeleteActionModal";
 import { EditPostModal } from "@/components/widgets/EditPostModal";
 import { Header } from "@/components/widgets/Header";
-import type { Post } from "@/types";
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { Suspense, useState } from "react";
-import toast from "react-hot-toast";
-import { z } from "zod";
-import { useAppForm } from "../hooks/form";
-import { useStore } from "../lib/store";
-import {
-  QueryErrorResetBoundary,
-  useMutation,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
 import {
   createPost,
   deletePost,
   fetchPosts,
   updatePost,
 } from "@/services/posts";
+import type { Post } from "@/types";
+import {
+  QueryErrorResetBoundary,
+  useMutation,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Suspense, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { Fallback } from "@/components/Fallback";
+import toast from "react-hot-toast";
+import { z } from "zod";
+import { useAppForm } from "../hooks/form";
+import { useStore } from "../lib/store";
 
 export const Route = createFileRoute("/")({
   beforeLoad: ({ context }) => {
@@ -223,7 +224,7 @@ function Home() {
     <QueryErrorResetBoundary>
       {({ reset }) => (
         <ErrorBoundary onReset={reset} FallbackComponent={Fallback}>
-          <Suspense fallback={<h1 className="text-5xl">Loading...</h1>}>
+          <Suspense fallback={<Loader/>}>
             <Feed />
           </Suspense>
         </ErrorBoundary>
