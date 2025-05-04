@@ -213,6 +213,11 @@ function Feed() {
               </li>
             ))}
           </ul>
+          {!posts.length && (
+            <div className="p-6 border-1 border-dashed border-primary">
+              <p className="text-center">Nothing here yet, try adding a post &#128516;</p>
+            </div>
+          )}
         </main>
       </div>
     </>
