@@ -41,7 +41,7 @@ export function Header() {
   const onSignOut = () => {
     document.cookie = "username=;max-age=0";
     updateStore({ field: "username", value: "" });
-    navigate({ to: "/signup", viewTransition: { types: ["slide-left"] } });
+    navigate({ to: "/signup" });
   };
 
   return (

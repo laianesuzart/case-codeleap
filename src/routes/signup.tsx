@@ -40,7 +40,7 @@ function Signup() {
     onSubmit: ({ value }) => {
       document.cookie = `username=${value.username}`;
       updateStore({ field: "username", value: value.username });
-      navigate({ to: "/", viewTransition: { types: ["slide-right"] } });
+      navigate({ to: "/" });
     },
   });
 
