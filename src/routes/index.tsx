@@ -176,7 +176,7 @@ function Feed() {
           >
             <fieldset className="grid gap-6 [&>:last-child]:place-self-end">
               <legend className="highlighted-text pb-4">
-                What&rsquo;s on your mind, {username}?
+                What&rsquo;s on your mind{username ? `, ${username}` : ""}?
               </legend>
               <form.AppField name="title">
                 {(field) => (
@@ -224,7 +224,7 @@ function Home() {
     <QueryErrorResetBoundary>
       {({ reset }) => (
         <ErrorBoundary onReset={reset} FallbackComponent={Fallback}>
-          <Suspense fallback={<Loader/>}>
+          <Suspense fallback={<Loader />}>
             <Feed />
           </Suspense>
         </ErrorBoundary>
