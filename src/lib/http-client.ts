@@ -3,7 +3,7 @@ enum StatusCode {
 }
 
 class HttpClient {
-  private baseUrl: string;
+  private readonly baseUrl: string;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
@@ -36,7 +36,11 @@ class HttpClient {
     if (response.status === StatusCode.NO_CONTENT) {
       return null as T;
     }
-    return (await response.json()) as T;
+    try {
+      return (await response.json()) as T;
+    } catch {
+      throw Error("Invalid response from the server");
+    }
   }
 
   async get<T>(url: string, headers?: HeadersInit): Promise<T> {

@@ -37,5 +37,5 @@ export async function updatePost(
 }
 
 export async function deletePost(postId: number) {
-  await client.delete(`/careers/${postId}/`);
+  return await client.delete(`/careers/${postId}/`);
 }
