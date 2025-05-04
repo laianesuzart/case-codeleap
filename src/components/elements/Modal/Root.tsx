@@ -4,8 +4,14 @@ interface Props {
   isOpen: boolean;
   children: ReactNode;
   onClose: () => void;
+  disableEscapeKeyDown?: boolean;
 }
-export function Root({ isOpen, children, onClose }: Props) {
+export function Root({
+  isOpen,
+  children,
+  onClose,
+  disableEscapeKeyDown = false,
+}: Props) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -15,6 +21,26 @@ export function Root({ isOpen, children, onClose }: Props) {
       else dialogNode.close();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (disableEscapeKeyDown) {
+          e.preventDefault();
+        } else {
+          onClose();
+        }
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [disableEscapeKeyDown, isOpen, onClose]);
 
   return (
     <dialog
