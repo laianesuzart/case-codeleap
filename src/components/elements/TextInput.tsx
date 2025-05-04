@@ -20,7 +20,7 @@ export function TextInput({
 }: Props) {
   const inputId = useId();
   const inputStyles = clsx(
-    "py-[5px] px-3 border-1 border-solid border-[#777] rounded-lg placeholder:text-sm placeholder:text-[#ccc] leading-tight",
+    "py-[5px] px-3 border-1 border-solid border-[#777] rounded-lg placeholder:text-sm placeholder:text-[#ccc] leading-tight disabled:bg-gray-100",
     error ? "border-error outline-error" : "outline-primary",
   );
 
