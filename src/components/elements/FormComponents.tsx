@@ -7,7 +7,10 @@ import { TextInput } from "./TextInput";
 export function SubscribeButton({
   label,
   variant,
-}: { label: string; variant?: ButtonVariant }) {
+}: {
+  label: string;
+  variant?: ButtonVariant;
+}) {
   const form = useFormContext();
   return (
     <form.Subscribe
@@ -23,6 +26,7 @@ export function SubscribeButton({
             type="submit"
             disabled={hasEmptyFields || isSubmitting}
             variant={variant}
+            loading={isSubmitting}
           >
             {label}
           </Button>
@@ -35,9 +39,11 @@ export function SubscribeButton({
 export function TextField({
   label,
   placeholder,
+  disabled,
 }: {
   label: string;
   placeholder?: string;
+  disabled?: boolean;
 }) {
   const field = useFieldContext<string>();
   const errors = useStore(field.store, (state) => state.meta.errors);
@@ -53,6 +59,7 @@ export function TextField({
       }}
       error={field.state.meta.isTouched && Boolean(errors.length)}
       helperText={field.state.meta.isTouched ? errors[0]?.message : ""}
+      disabled={disabled}
     />
   );
 }
@@ -60,9 +67,11 @@ export function TextField({
 export function TextArea({
   label,
   placeholder,
+  disabled,
 }: {
   label: string;
   placeholder?: string;
+  disabled?: boolean;
 }) {
   const field = useFieldContext<string>();
   const errors = useStore(field.store, (state) => state.meta.errors);
@@ -79,6 +88,7 @@ export function TextArea({
       }
       error={field.state.meta.isTouched && Boolean(errors.length)}
       helperText={field.state.meta.isTouched ? errors[0]?.message : ""}
+      disabled={disabled}
     />
   );
 }

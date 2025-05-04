@@ -61,6 +61,11 @@ if (rootElement && !rootElement.innerHTML) {
             toastOptions={{
               duration: 3000,
               removeDelay: 1000,
+              error: {
+                style: {
+                  color: "#ff5151",
+                },
+              },
             }}
           />
         </ServerTimeProvider>
