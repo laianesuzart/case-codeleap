@@ -1,4 +1,3 @@
-import { usePostsContext } from "@/hooks/PostsContext";
 import { useAppForm } from "@/hooks/form";
 import type { Post } from "@/types";
 import { useEffect } from "react";
@@ -10,6 +9,12 @@ interface Props {
   isOpen: boolean;
   post: Post | null;
   onClose: () => void;
+  onSave: (values: {
+    title: string;
+    content: string;
+    id: number;
+  }) => Promise<void>;
+  disabledFields?: boolean;
 }
 
 const schema = z.object({
@@ -17,8 +22,13 @@ const schema = z.object({
   content: z.string().min(1, "Required field").max(2048, "Content is too long"),
 });
 
-export function EditPostModal({ isOpen, post, onClose }: Props) {
-  const { onEditPost } = usePostsContext();
+export function EditPostModal({
+  isOpen,
+  post,
+  onClose,
+  onSave,
+  disabledFields = false,
+}: Props) {
   const form = useAppForm({
     defaultValues: {
       title: "",
@@ -27,11 +37,9 @@ export function EditPostModal({ isOpen, post, onClose }: Props) {
     validators: {
       onBlur: schema,
     },
-    onSubmit: ({ value, formApi }) => {
+    onSubmit: async ({ value }) => {
       if (!post) return;
-      onEditPost({ title: value.title, content: value.content }, post.id);
-      formApi.reset();
-      onClose();
+      await onSave({ title: value.title, content: value.content, id: post.id });
     },
   });
 
@@ -43,7 +51,11 @@ export function EditPostModal({ isOpen, post, onClose }: Props) {
   }, [post, form]);
 
   return (
-    <Modal.Root isOpen={isOpen} onClose={onClose}>
+    <Modal.Root
+      isOpen={isOpen}
+      onClose={onClose}
+      disableEscapeKeyDown={disabledFields}
+    >
       <Modal.Content>
         <form
           onSubmit={(e) => {
@@ -56,12 +68,20 @@ export function EditPostModal({ isOpen, post, onClose }: Props) {
             <legend className="highlighted-text pb-4">Edit item</legend>
             <form.AppField name="title">
               {(field) => (
-                <field.TextField label="Title" placeholder="Hello world" />
+                <field.TextField
+                  label="Title"
+                  placeholder="Hello world"
+                  disabled={disabledFields}
+                />
               )}
             </form.AppField>
             <form.AppField name="content">
               {(field) => (
-                <field.TextArea label="Content" placeholder="Content here" />
+                <field.TextArea
+                  label="Content"
+                  placeholder="Content here"
+                  disabled={disabledFields}
+                />
               )}
             </form.AppField>
             <div className="flex gap-4">

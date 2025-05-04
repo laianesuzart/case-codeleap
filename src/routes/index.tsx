@@ -2,14 +2,26 @@ import FeedPost from "@/components/modules/FeedPost";
 import { ConfirmDeleteActionModal } from "@/components/widgets/ConfirmDeleteActionModal";
 import { EditPostModal } from "@/components/widgets/EditPostModal";
 import { Header } from "@/components/widgets/Header";
-import { PostsProvider, usePostsContext } from "@/hooks/PostsContext";
 import type { Post } from "@/types";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { useAppForm } from "../hooks/form";
 import { useStore } from "../lib/store";
+import {
+  QueryErrorResetBoundary,
+  useMutation,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import {
+  createPost,
+  deletePost,
+  fetchPosts,
+  updatePost,
+} from "@/services/posts";
+import { ErrorBoundary } from "react-error-boundary";
+import { Fallback } from "@/components/Fallback";
 
 export const Route = createFileRoute("/")({
   beforeLoad: ({ context }) => {
@@ -28,13 +40,65 @@ const schema = z.object({
   content: z.string().min(1, "Required field").max(2048, "Content is too long"),
 });
 
-function Feed() {
-  const { username } = useStore((state) => state);
-  const { posts = [], onCreatePost, onDeletePost } = usePostsContext();
+const usePosts = () =>
+  useSuspenseQuery({
+    queryKey: ["posts"],
+    queryFn: fetchPosts,
+  });
 
+function Feed() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+
+  const { username } = useStore((state) => state);
+  const { queryClient } = Route.useRouteContext();
+  const { data: posts } = usePosts();
+
+  const addPostMutation = useMutation({
+    mutationFn: createPost,
+    onMutate: () => setIsPending(true),
+    onSuccess: (data) => queryClient.setQueryData(["posts"], [data, ...posts]),
+    onError: () => toast.error("Please try again"),
+    onSettled: () => setIsPending(false),
+  });
+
+  const editPostMutation = useMutation({
+    mutationFn: (newPost: { title: string; content: string; id: number }) => {
+      return updatePost(
+        { title: newPost.title, content: newPost.content },
+        newPost.id,
+      );
+    },
+    onMutate: () => setIsPending(true),
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ["posts"],
+        posts.map((post) => (data.id === post.id ? data : post)),
+      );
+      handleCloseEditModal();
+    },
+    onError: () => toast.error("Please try again"),
+    onSettled: () => setIsPending(false),
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: ({ id }: { id: number }) => {
+      return deletePost(id);
+    },
+    onMutate: () => setIsPending(true),
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData(
+        ["posts"],
+        posts.filter((post) => post.id !== variables.id),
+      );
+      toast.success("Post deleted");
+      setIsDeleteModalOpen(false);
+    },
+    onError: () => toast.error("Please try again"),
+    onSettled: () => setIsPending(false),
+  });
 
   const form = useAppForm({
     defaultValues: {
@@ -44,11 +108,19 @@ function Feed() {
     validators: {
       onBlur: schema,
     },
-    onSubmit: ({ value, formApi }) => {
-      onCreatePost({ username, ...value });
+    onSubmit: async ({ value, formApi }) => {
+      await addPostMutation.mutateAsync({ username, ...value });
       formApi.reset();
     },
   });
+
+  const handleEditPost = async (values: {
+    title: string;
+    content: string;
+    id: number;
+  }) => {
+    await editPostMutation.mutateAsync(values);
+  };
 
   const handleOpenEditModal = (post: Post) => {
     setSelectedPost(post);
@@ -62,9 +134,7 @@ function Feed() {
 
   const handleDeletePost = () => {
     if (!selectedPost) return;
-    setIsDeleteModalOpen(false);
-    onDeletePost(selectedPost.id);
-    toast.success("Post deleted");
+    deletePostMutation.mutate({ id: selectedPost.id });
   };
 
   const handleOpenDeleteModal = (post: Post) => {
@@ -83,11 +153,14 @@ function Feed() {
         isOpen={isEditModalOpen}
         post={selectedPost}
         onClose={handleCloseEditModal}
+        onSave={handleEditPost}
+        disabledFields={isPending}
       />
       <ConfirmDeleteActionModal
         isOpen={isDeleteModalOpen}
         onClose={handleCloseDeleteModal}
         onConfirm={handleDeletePost}
+        loading={isPending}
       />
       <div className="min-h-dvh pb-10 max-w-[50rem] bg-white mx-auto [view-transition-name:main-content]">
         <Header />
@@ -106,12 +179,20 @@ function Feed() {
               </legend>
               <form.AppField name="title">
                 {(field) => (
-                  <field.TextField label="Title" placeholder="Hello world" />
+                  <field.TextField
+                    label="Title"
+                    placeholder="Hello world"
+                    disabled={isPending}
+                  />
                 )}
               </form.AppField>
               <form.AppField name="content">
                 {(field) => (
-                  <field.TextArea label="Content" placeholder="Content here" />
+                  <field.TextArea
+                    label="Content"
+                    placeholder="Content here"
+                    disabled={isPending}
+                  />
                 )}
               </form.AppField>
               <form.AppForm>
@@ -139,8 +220,14 @@ function Feed() {
 
 function Home() {
   return (
-    <PostsProvider>
-      <Feed />
-    </PostsProvider>
+    <QueryErrorResetBoundary>
+      {({ reset }) => (
+        <ErrorBoundary onReset={reset} FallbackComponent={Fallback}>
+          <Suspense fallback={<h1 className="text-5xl">Loading...</h1>}>
+            <Feed />
+          </Suspense>
+        </ErrorBoundary>
+      )}
+    </QueryErrorResetBoundary>
   );
 }
